@@ -8,6 +8,7 @@ import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.utils.Utils;
 
 import cl.usach.storm.npl.bolts.LanguageDetectorBolt;
+import cl.usach.storm.npl.bolts.MongoBolt;
 import cl.usach.storm.npl.bolts.SentimentAnalysisBolt;
 import cl.usach.storm.npl.spouts.TwitterSampleSpout;
 
@@ -29,7 +30,8 @@ public class Topology {
 		
 		b.setSpout("TwitterSampleSpout", new TwitterSampleSpout());
 		b.setBolt("LanguageDetectorBolt", new LanguageDetectorBolt(),1).shuffleGrouping("TwitterSampleSpout");
-		b.setBolt("SentimentAnalysisBolt", new SentimentAnalysisBolt(),5).shuffleGrouping("LanguageDetectorBolt");
+		b.setBolt("SentimentAnalysisBolt", new SentimentAnalysisBolt(),1).shuffleGrouping("LanguageDetectorBolt");
+		b.setBolt("MongoBolt", new MongoBolt(),1).shuffleGrouping("SentimentAnalysisBolt");
 		
 		if (args != null && args.length > 0) {
 			try {

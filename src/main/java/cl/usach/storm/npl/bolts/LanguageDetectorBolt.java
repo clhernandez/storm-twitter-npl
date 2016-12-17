@@ -55,26 +55,16 @@ public class LanguageDetectorBolt extends BaseRichBolt {
 		Status tweet = (Status) input.getValueByField("tweet");
 		String line = tweet.getText();
 		
-		// TODO Auto-generated method stub
-		
 		try {
 			
-			//List<String> langs = new ArrayList<String>();
-			//langs.add("en");
-			//langs.add("es");
-			//languageProfiles = new LanguageProfileReader().read(langs);
-			
-
 			TextObject textObject = textObjectFactory.forText(line);
 			Optional<LdLocale> lang = languageDetector.detect(textObject);
+			String textlang = "";
 			if(lang.isPresent() ){
 				//System.out.println(line+" >> "+lang.get().getLanguage());
-				String textlang = lang.get().getLanguage().toUpperCase();
-				collector.emit(new Values(tweet.getUser().getScreenName(), textlang , line));
-			}else{
-				//System.out.println("unknow: "+lang);
+				textlang = lang.get().getLanguage().toUpperCase();
 			}
-			
+			collector.emit(new Values(tweet.getUser().getScreenName(), textlang , line));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

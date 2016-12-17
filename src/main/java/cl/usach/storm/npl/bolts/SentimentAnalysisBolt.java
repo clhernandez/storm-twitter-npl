@@ -7,7 +7,9 @@ import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -20,14 +22,13 @@ import twitter4j.Status;
 
 public class SentimentAnalysisBolt extends BaseRichBolt {
 	
-	StanfordCoreNLP pipeline = null;
+	private StanfordCoreNLP pipeline = null;
+	private OutputCollector collector;
+	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-        
-        this.pipeline = new StanfordCoreNLP(props);
+		this.collector = collector;
 	}
 
 	@Override
@@ -36,26 +37,36 @@ public class SentimentAnalysisBolt extends BaseRichBolt {
 		String line= (String) input.getValueByField("text");
 		String user= (String) input.getValueByField("user");
 		String lang= (String) input.getValueByField("lang");
+
+		Properties props = new Properties();
+		props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
 		
+		pipeline = new StanfordCoreNLP(props);
 
         int mainSentiment = 0;
-        if (line != null && line.length() > 0) {
-            int longest = 0;
-                       
-            Annotation annotation = this.pipeline.process(line);
-            for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
-            	
-                Tree tree = sentence.get(SentimentAnnotatedTree.class);
-                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                String partText = sentence.toString();
-                if (partText.length() > longest) {
-                    mainSentiment = sentiment;
-                    longest = partText.length();
-                }
- 
-            }
+        if(lang.toUpperCase().equals("EN")){
+
+	        if (line != null && line.length() > 0) {
+	            int longest = 0;
+	                       
+	            Annotation annotation = this.pipeline.process(line);
+	            for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
+	            	
+	                Tree tree = sentence.get(SentimentAnnotatedTree.class);
+	                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
+	                String partText = sentence.toString();
+	                if (partText.length() > longest) {
+	                    mainSentiment = sentiment;
+	                    longest = partText.length();
+	                }
+	 
+	            }
+	        }
+        }else{
+        	mainSentiment = -1;//Unknow
         }
-        System.out.println("@"+user+": "+line+": "+identifySentiment(mainSentiment));
+        //System.out.println("@"+user+": "+line+": "+identifySentiment(mainSentiment));
+        collector.emit(new Values(user, lang, line, identifySentiment(mainSentiment)));
 
 
 	}
@@ -88,7 +99,7 @@ public class SentimentAnalysisBolt extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		// TODO Auto-generated method stub
-		
+		declarer.declare(new Fields("user", "lang", "text", "sentiment"));
 	}
 
 }
