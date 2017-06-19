@@ -23,6 +23,7 @@ import com.optimaize.langdetect.text.CommonTextObjectFactories;
 import com.optimaize.langdetect.text.TextObject;
 import com.optimaize.langdetect.text.TextObjectFactory;
 
+import cl.usach.storm.npl.eda.Tweet;
 import twitter4j.Status;
 
 public class LanguageDetectorBolt extends BaseRichBolt {
@@ -52,8 +53,18 @@ public class LanguageDetectorBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		Status tweet = (Status) input.getValueByField("tweet");
-		String line = tweet.getText();
+		String line="";
+		String user="";
+		if(input.getValueByField("tweet") instanceof Status){
+			Status tweet = (Status) input.getValueByField("tweet");
+			line = tweet.getText();
+			user = tweet.getUser().getScreenName();
+		}else if(input.getValueByField("tweet") instanceof Tweet){
+			Tweet tweet = (Tweet) input.getValueByField("tweet");
+			line = tweet.getText();
+			user = tweet.getUser();
+		}
+		
 		
 		try {
 			
@@ -64,7 +75,7 @@ public class LanguageDetectorBolt extends BaseRichBolt {
 				//System.out.println(line+" >> "+lang.get().getLanguage());
 				textlang = lang.get().getLanguage().toUpperCase();
 			}
-			collector.emit(new Values(tweet.getUser().getScreenName(), textlang , line));
+			collector.emit(new Values(user, textlang , line));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -1,5 +1,7 @@
 package cl.usach.storm.npl.bolts;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.storm.task.OutputCollector;
@@ -15,14 +17,10 @@ import com.mongodb.client.MongoDatabase;
 public class MongoBolt extends BaseRichBolt{
 
 	@Override
-	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {}
 
 	@Override
 	public void execute(Tuple input) {
-		// TODO Auto-generated method stub
 		String text= (String) input.getValueByField("text");
 		String user= (String) input.getValueByField("user");
 		String lang= (String) input.getValueByField("lang");
@@ -31,12 +29,14 @@ public class MongoBolt extends BaseRichBolt{
 		try(MongoClient mongoClient = new MongoClient()){
 
 			MongoDatabase db = mongoClient.getDatabase("storm-twitter-npl");
+			SimpleDateFormat dt1 = new SimpleDateFormat("yyyyMMddHHmmss");
 			
 			Document doc = new Document();
 			doc.append("user", user);
 			doc.append("text", text);
 			doc.append("lang", lang);
 			doc.append("sentiment", sentiment);
+			doc.append("timestamp", dt1.format(new Date()));
 					
 			db.getCollection("sentiment").insertOne(doc);
 		}
