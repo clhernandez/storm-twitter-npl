@@ -338,16 +338,28 @@ public class QueryTweets {
 	}
 
 	public static void main(String[] args) {
-		//generateStaticQueueKafka();
 		
-		resetKafkaOffset();
+		if(args.length==0){
+			System.out.println("Error, must pass init parameter: static, reset, tokafka, test");
+		}else{
+			switch(args[0]){
+				case "static":
+					double seconds = (args[1]!=null) ? Double.valueOf(args[1]) : 300; 
+					generateStaticQueueKafka(seconds);
+					break;
+				case "reset":
+					resetKafkaOffset();
+					break;
+				case "tokafka":
+					mongoToKafka();
+					break;
+				case "test":
+					testQueryKafka();
+					break;
+			}
+		}
+		
 
-//		mongoToKafka();
-//testOffsets();
-		
-		//mongoToKafka();
-		//generateStaticQueueKafka(300);
-		//testQueryKafka();
 	}
 
 }
