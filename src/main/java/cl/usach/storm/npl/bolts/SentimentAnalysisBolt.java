@@ -27,22 +27,21 @@ public class SentimentAnalysisBolt extends BaseRichBolt {
 	
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		// TODO Auto-generated method stub
+		Properties props = new Properties();
+		props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
+		pipeline = new StanfordCoreNLP(props);
+		
 		this.collector = collector;
 	}
 
 	@Override
 	public void execute(Tuple input) {
+		long init = System.currentTimeMillis();
 		// TODO Auto-generated method stub
 		String line= (String) input.getValueByField("text");
 		String user= (String) input.getValueByField("user");
 		String lang= (String) input.getValueByField("lang");
-
-		Properties props = new Properties();
-		props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
 		
-		pipeline = new StanfordCoreNLP(props);
-
         int mainSentiment = 0;
         if(lang.toUpperCase().equals("EN")){
 
@@ -66,6 +65,7 @@ public class SentimentAnalysisBolt extends BaseRichBolt {
         	mainSentiment = -1;//Unknow
         }
         //System.out.println("@"+user+": "+line+": "+identifySentiment(mainSentiment));
+        //System.out.println("time: " + (System.currentTimeMillis() - init));
         collector.emit(new Values(user, lang, line, identifySentiment(mainSentiment)));
 
 

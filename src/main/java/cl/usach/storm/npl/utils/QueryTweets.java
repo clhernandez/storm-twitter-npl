@@ -13,6 +13,7 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.storm.utils.Utils;
 import org.bson.Document;
 
 import com.google.gson.Gson;
@@ -224,7 +225,7 @@ public class QueryTweets {
 		double time = seconds; //segundos
 		int window = 3;// cantidad de ventanas
 		int eventsPerWindow = (int) Math.ceil(time / window);
-		int events = 200;
+		int events = 100;
 		
 		List<Integer> eventsQty = Arrays.asList(events,events*2,events);
 		KafkaProducer<String, String> producer = new KafkaProducer<String, String>(propsQty);
@@ -233,6 +234,7 @@ public class QueryTweets {
 			for (int i = 0; i < eventsPerWindow; i++) {
 				producer.send(new ProducerRecord<String, String>("tweetsQty", "qty", qty.toString()));
 			}
+			Utils.sleep(1000);
 		}
 		
 	}
@@ -338,7 +340,9 @@ public class QueryTweets {
 	}
 
 	public static void main(String[] args) {
-		
+		//generateStaticQueueKafka(900);
+		resetKafkaOffset();
+		//mongoToKafka();
 		if(args.length==0){
 			System.out.println("Error, must pass init parameter: static, reset, tokafka, test");
 		}else{

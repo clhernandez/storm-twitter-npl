@@ -36,7 +36,7 @@ public class Topology {
 		b.setBolt("LanguageDetectorBolt", new LanguageDetectorBolt(),1).setNumTasks(5).fieldsGrouping("TwitterSpout",new Fields("tweet"));
 		b.setBolt("SentimentAnalysisBolt", new SentimentAnalysisBolt(),3).setNumTasks(10).fieldsGrouping("LanguageDetectorBolt", new Fields("user"));
 		b.setBolt("MongoBolt", new MongoBolt(),3).setNumTasks(10).fieldsGrouping("SentimentAnalysisBolt", new Fields("user"));
-		
+	
 		if (args != null && args.length > 0) {
 			try {
 				StormSubmitter.submitTopology(TOPOLOGY_NAME, config, b.createTopology());

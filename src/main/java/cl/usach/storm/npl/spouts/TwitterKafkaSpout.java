@@ -67,13 +67,13 @@ public class TwitterKafkaSpout extends BaseRichSpout{
     	    	boolean firstCycle = true;
     	    	while((records = tweetQtyConsumer.poll(100))!=null){
     	        	for (ConsumerRecord<String, String> record : records) {
-    	        		System.out.println(record.offset() + ": " + record.value());
+    	        		//System.out.println(record.offset() + ": " + record.value());
     	        		long qtyOffset = record.offset();
     	        		long sendQty = Long.parseLong(record.value());
     	        		
     	        		ConsumerRecords<String, String> tweetRecords = null;
     	        		if(qtyOffset>0 && firstCycle){
-    	        			System.out.println("<<RESET KAFKA SPOUT>>");
+    	        			//System.out.println("<<RESET KAFKA SPOUT>>");
     	        			//evaluar cuantos eventos faltan por procesar del ciclo actual
     	        			
     	    	    		for (TopicPartition tp : records.partitions()) {
@@ -114,7 +114,7 @@ public class TwitterKafkaSpout extends BaseRichSpout{
 	        	        				tweetRecords = tweetsConsumer.poll(100);
 	        	        				for (ConsumerRecord<String, String> tweetRecord: tweetRecords) {
 	        	        					Tweet tweet = gson.fromJson(tweetRecord.value(), Tweet.class);
-	        	        					System.out.println(">>EMMIT AGAIN" + tweet);
+	        	        					//System.out.println(">>EMMIT AGAIN" + tweet);
 	                	        			try {
 	        									queue.put(tweet);
 	        								} catch (InterruptedException e) {
@@ -123,7 +123,7 @@ public class TwitterKafkaSpout extends BaseRichSpout{
 	                	        			nextTuple();
 	                	            	}
 	            	        		}
-	        	    	    		System.out.println("<<SLEEP>>");
+	        	    	    		//System.out.println("<<SLEEP>>");
 	            					Utils.sleep(1000);
 	        	    	    		
 	    	    	    		}
@@ -143,7 +143,7 @@ public class TwitterKafkaSpout extends BaseRichSpout{
             	        			nextTuple();
             	            	}
         	        		}
-    	        			System.out.println("<<SLEEP>>");
+    	        			//System.out.println("<<SLEEP>>");
         					Utils.sleep(1000);
     	        		}
     	        		firstCycle = false;
@@ -156,26 +156,26 @@ public class TwitterKafkaSpout extends BaseRichSpout{
 
     @Override
     public void close() {
-    	System.out.println("<<CLOSE>>");
+    	//System.out.println("<<CLOSE>>");
         super.close();
     }
 
     @Override
     public void activate() {
-    	System.out.println("<<ACTIVATE>>");
+    	//System.out.println("<<ACTIVATE>>");
         super.activate();
     }
 
     @Override
     public void deactivate() {
-    	System.out.println("<<DEACTIVATE>>");
+    	//System.out.println("<<DEACTIVATE>>");
         super.deactivate();
     }
 
     @Override
     public void nextTuple() {
     	Tweet q = queue.poll();
-    	System.out.println(q);
+    	//System.out.println(q);
 		if (q == null) {
 			Utils.sleep(1);
         } else {

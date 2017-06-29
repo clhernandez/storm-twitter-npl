@@ -25,5 +25,4 @@ while(cursor.hasNext()){
 	db.tweets.update({_id : doc._id}, {$set: {created_at: new Date(doc.created_at)}}) 
 }
 
-mongoimport --db storm-world-cup --collection tweets --file tweet-part3.json 
-
+mongoimport --db storm-world-cup --collection tweets --file tweet-part3.json
