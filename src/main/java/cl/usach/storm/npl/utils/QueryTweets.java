@@ -340,8 +340,8 @@ public class QueryTweets {
 	}
 
 	public static void main(String[] args) {
-		//generateStaticQueueKafka(900);
-		//resetKafkaOffset();
+		//generateStaticQueueKafka(4200);
+		resetKafkaOffset();
 		//mongoToKafka();
 		if(args.length==0){
 			System.out.println("Error, must pass init parameter: static, reset, tokafka, test");

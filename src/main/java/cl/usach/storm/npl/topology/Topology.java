@@ -33,9 +33,9 @@ public class Topology {
 		//b.setSpout("TwitterSpout", TwitterMongoSpout.getInstance(),1);
 		//b.setSpout("TwitterSpout", new TwitterSampleSpout(),1);
 		//b.setSpout("TwitterSampleSpout", new TwitterSampleSpout(),1);
-		b.setBolt("LanguageDetectorBolt", new LanguageDetectorBolt(),1).setNumTasks(5).fieldsGrouping("TwitterSpout",new Fields("tweet"));
-		b.setBolt("SentimentAnalysisBolt", new SentimentAnalysisBolt(),3).setNumTasks(10).fieldsGrouping("LanguageDetectorBolt", new Fields("user"));
-		b.setBolt("MongoBolt", new MongoBolt(),3).setNumTasks(10).fieldsGrouping("SentimentAnalysisBolt", new Fields("user"));
+		b.setBolt("LanguageDetectorBolt", new LanguageDetectorBolt(),1).setNumTasks(15).fieldsGrouping("TwitterSpout",new Fields("tweet"));
+		b.setBolt("SentimentAnalysisBolt", new SentimentAnalysisBolt(),1).setNumTasks(15).fieldsGrouping("LanguageDetectorBolt", new Fields("user"));
+		b.setBolt("MongoBolt", new MongoBolt(),1).setNumTasks(15).fieldsGrouping("SentimentAnalysisBolt", new Fields("user"));
 	
 		if (args != null && args.length > 0) {
 			try {
